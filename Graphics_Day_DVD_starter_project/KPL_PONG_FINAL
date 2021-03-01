@@ -1,0 +1,238 @@
+#KPL_PONG_FINAL
+#Includes randomizer for bounceback direction
+#Evan Nordquist
+#Designed for Python 2 using Pygame
+#Updated for Python 3, March 1, 2020
+
+
+
+
+#Import Modules and Declare Global Variables
+import random, sys, time, pygame
+from pygame.locals import *
+
+FPS = 60
+fpsClock = pygame.time.Clock()
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+BALL_SIZE = 25
+BALL_SPEED = 6.25  #needs to be evenly divisible by BALL_SIZE.  
+GUTTER = 50
+PADDLE_HEIGHT = 200
+PADDLE_WIDTH = 50
+ball_x_speed = BALL_SPEED
+ball_y_speed = 10
+MOVERATE = 5
+RIGHT_THRESHOLD = SCREEN_WIDTH - GUTTER - PADDLE_WIDTH - BALL_SIZE
+
+#Set up colors for future use
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+DARKGREEN = (34, 139, 34)
+GREY = (128,128,128)
+
+#Starting position of the Ball
+ball_x_pos = SCREEN_WIDTH//2
+ball_y_pos = SCREEN_HEIGHT//2
+
+#Starting position of the Paddles
+Paddle1_y_pos = ((SCREEN_HEIGHT//2)-(PADDLE_HEIGHT//2))
+Paddle1_x_pos = GUTTER
+Paddle2_y_pos = ((SCREEN_HEIGHT//2)-(PADDLE_HEIGHT//2))
+Paddle2_x_pos = SCREEN_WIDTH - GUTTER - PADDLE_WIDTH
+Paddle1_down = False
+Paddle1_up = False
+Paddle2_down = False
+Paddle2_up = False
+
+#Game Manager
+gameOverMode = False
+score1 = 0
+score2 = 0
+
+#Load the graphics
+
+pongBall = pygame.image.load('pong_ball_25_cube.png')
+pongPaddle1 = pygame.image.load('pong_paddle.png')
+pongPaddle2 = pygame.image.load('pong_paddle.png')
+
+#Load the Sound effects
+pygame.mixer.init(44100, -16, 2, 2048)
+beep1 = pygame.mixer.Sound('pongBlip1.ogg')
+beep2 = pygame.mixer.Sound('pongBlip2.ogg')
+
+#Set up the Game window
+DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("KPL - PONG") #This is the title
+#DISPLAYSURF.fill(BLACK)
+
+
+#Helper functions
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+def checkForQuit():
+    for event in pygame.event.get(QUIT): # get all the QUIT events
+        terminate() # terminate if any QUIT events are present
+
+def nextRound():
+    global ball_x_pos, ball_y_pos, ball_y_speed
+    ball_x_pos = SCREEN_WIDTH//2
+    ball_y_pos = SCREEN_HEIGHT//2
+    ball_y_speed = random.randint(1,4)
+    #print "during next round The Ball y speed is", Ball_y_speed
+
+def scoreBoard():
+    #BASICFONT = pygame.font.Font('freesansbold.ttf', 48)
+    RETROFONT = pygame.font.Font('PressStart2P.ttf', 48)
+    scoreSurf = RETROFONT.render( str(score1) + '   ' + str(score2), True, WHITE)
+    scoreRect = scoreSurf.get_rect()
+    scoreRect.topleft = (SCREEN_WIDTH//3, SCREEN_HEIGHT //5)
+    DISPLAYSURF.blit(scoreSurf, scoreRect)
+
+def drawBackground():
+    DISPLAYSURF.fill(BLACK) # Paint the whole screen black
+    pygame.draw.line(DISPLAYSURF, WHITE, (SCREEN_WIDTH//2,0),(SCREEN_WIDTH//2,SCREEN_HEIGHT), 5)
+
+def gameOver():
+    global gameOverMode
+    gameOverMode = True
+
+def gameReset():
+    global gameOverMode
+    global score1, score2
+    gameOverMode = False
+    score1 = 0
+    score2 = 0
+    nextRound()
+
+def ballRandomizer():
+    global ball_y_speed
+    x = random.randint(-4,4)
+    ball_y_speed = ball_y_speed + (1*x)
+
+#Run the game loop
+
+def main():
+    global ball_x_pos, ball_y_pos, ball_x_speed, ball_y_speed
+    global FPSCLOCK, BALL_SIZE, Paddle2_y_pos, Paddle1_y_pos, Paddle2_up, Paddle2_down
+    global Paddle1_up, Paddle1_down
+    global score1, score2
+    pygame.init()
+    #BASICFONT = pygame.font.Font('freesansbold.ttf', 32)
+
+    #pygame.draw.circle(DISPLAYSURF, WHITE, (800, 600), 20, 0)
+
+    if not gameOverMode:
+        ball_x_pos = ball_x_pos + ball_x_speed
+        ball_y_pos = ball_y_pos + ball_y_speed
+
+    drawBackground()
+
+    scoreBoard()
+
+    DISPLAYSURF.blit(pongBall, (int(ball_x_pos), int(ball_y_pos)))
+    DISPLAYSURF.blit(pongPaddle1, (Paddle1_x_pos, Paddle1_y_pos))
+    DISPLAYSURF.blit(pongPaddle2, (Paddle2_x_pos, Paddle2_y_pos))
+    #Bounce off the ceiling
+    if(ball_y_pos <= 0):
+        ball_y_speed = -ball_y_speed
+
+    #Bounce off the floor
+    if(ball_y_pos >= SCREEN_HEIGHT - BALL_SIZE):
+        ball_y_speed = -ball_y_speed
+
+    #Bounce off the right paddle
+    if(ball_x_pos == ((SCREEN_WIDTH - GUTTER - PADDLE_WIDTH - BALL_SIZE))):
+        #print "hit the right paddle"
+        if ((Paddle2_y_pos - (BALL_SIZE*2//3)) <= ball_y_pos <= (Paddle2_y_pos + PADDLE_HEIGHT - (BALL_SIZE//3))):
+            ballRandomizer()
+            ball_x_speed = -ball_x_speed
+            beep1.play()
+        
+    #Bounce off the right wall
+    if(ball_x_pos >= (SCREEN_WIDTH - BALL_SIZE)):
+        ball_x_speed = -ball_x_speed
+        #print "hit the right wall"
+        nextRound()
+        score1 +=1
+
+    #Hit the left wall
+    if(ball_x_pos <= (0)):
+        ball_x_speed = -ball_x_speed
+        #print "hit the left wall"
+        nextRound()
+        score2 +=1
+
+    #Bounce off the left paddle
+    if(ball_x_pos == (GUTTER+PADDLE_WIDTH)):
+        if ((Paddle1_y_pos - (BALL_SIZE*2//3)) <= ball_y_pos <= (Paddle1_y_pos + PADDLE_HEIGHT - (BALL_SIZE//3))):
+            ballRandomizer()
+            ball_x_speed = -ball_x_speed
+            beep2.play()
+            
+        
+    pygame.display.update()    # Refreshes the display
+    fpsClock.tick(FPS)
+    # Check for a QUIT event (such as closing the window)
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            terminate()
+
+        elif event.type == KEYDOWN:
+            if event.key == K_UP:
+                #print( "you pressed up")
+                Paddle2_up = True
+                Paddle2_down = False
+                
+            if event.key == K_w:
+                #print( "you pressed w")
+                Paddle1_up = True
+                Paddle1_down = False
+                
+            if event.key == K_DOWN:
+                #print ("you pressed down")
+                Paddle2_up = False
+                Paddle2_down = True
+                
+            if event.key == K_s:
+                #print ("you pressed s")
+                Paddle1_up = False
+                Paddle1_down = True
+                
+            if event.key == K_r:
+                #print ("you pressed r")
+                gameReset()
+
+    if not gameOverMode:
+        if Paddle1_up:
+            Paddle1_y_pos -= MOVERATE
+            if Paddle1_y_pos < 5:
+                Paddle1_up = False
+
+        if Paddle1_down:
+            Paddle1_y_pos += MOVERATE
+            if Paddle1_y_pos > (SCREEN_HEIGHT - PADDLE_HEIGHT - 5):
+                Paddle1_down = False
+
+        if Paddle2_up:
+            Paddle2_y_pos -= MOVERATE
+            if Paddle2_y_pos < 5:
+                Paddle2_up = False
+
+        if Paddle2_down:
+            Paddle2_y_pos += MOVERATE
+            if Paddle2_y_pos > (SCREEN_HEIGHT - PADDLE_HEIGHT - 5):
+                Paddle2_down = False
+
+    if score1 >= 10 or score2 >=10:
+        scoreBoard()
+        gameOver()
+
+while True:
+    main()
