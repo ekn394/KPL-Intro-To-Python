@@ -1,2 +1,2 @@
-# KPL-Intro-To-Coding
-Course materials for KPL's Intro to Coding class.  
+# KPL-Intro-To-Python
+Course materials for KPL's Intro to Python Programming Class  
