@@ -1,6 +1,6 @@
 #KPL Intro to Coding Final Project
 #The Pong code is started but not complete
-#Pong in progress - still has some bugs to fix in the code that is present
+#Pong in progress - Starting point for class # 7
 
 # Import Modules and Declare Global Variables
 
@@ -50,7 +50,7 @@ left_paddle = pygame.image.load('pong_paddle.png')
 
 # Set up the Game window
 DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("DVD Screensaveer 97") #This is the title
+pygame.display.set_caption("Pong in Progress") #This is the title
 
 '''
 #Load the Sound effects
@@ -67,7 +67,7 @@ def scoreBoard():
     RETROFONT = pygame.font.Font('PressStart2P.ttf', 48)
     scoreSurf = RETROFONT.render( str(score1) + '   ' + str(score2), True, WHITE)
     scoreRect = scoreSurf.get_rect()
-    scoreRect.topleft = (SCREEN_WIDTH/3, SCREEN_HEIGHT /5)
+    scoreRect.topleft = (SCREEN_WIDTH//3, SCREEN_HEIGHT //5)
     DISPLAYSURF.blit(scoreSurf, scoreRect)
 '''
 
@@ -84,8 +84,8 @@ def main():
     ball_y_pos = ball_y_pos + ball_y_speed # Update the ball's y position
     
     DISPLAYSURF.blit(theballGraphic, (ball_x_pos, ball_y_pos)) #ball
-    DISPLAYSURF.blit(right_paddle, (700, 200)) #left paddle
-    DISPLAYSURF.blit(left_paddle, (50, 200)) #right paddle
+    DISPLAYSURF.blit(left_paddle, (50, 200)) #left paddle
+    DISPLAYSURF.blit(right_paddle, (700, 200)) #right paddle
 
 
 
