@@ -5,8 +5,8 @@
 # 1. Enable the scoreboard
 # 2. Add points when the ball hits either left or right walls
 # 3. Reset the ball to the center when a point is scored
-# 4. Have the ball bounce off of the paddles
-# 5. Enable key presses to move the paddles
+# 4. Enable key presses to move the paddles
+# 5. Have the ball bounce off of the paddles
 # 6. Make a function that changes the trajectory of the ball.
 # 7. Add sound effects.
 # 8. Have fun!
