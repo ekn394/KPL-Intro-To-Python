@@ -20,7 +20,7 @@ ball_SPEED = 5
 
 ball_x_speed = ball_SPEED
 ball_y_speed = ball_SPEED
-SCREEN_HEIGHT
+
 
 
 # Set up colors for future use
@@ -118,9 +118,9 @@ def main():
         '''    
         elif event.type == KEYDOWN:
             if event.key == K_UP:
-                print "you pressed up"
+                print("you pressed up")
             if event.key == K_DOWN:
-                print "you pressed down"
+                print("you pressed down")
         '''
 	
 	
